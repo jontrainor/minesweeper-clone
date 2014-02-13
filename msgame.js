@@ -20,26 +20,26 @@
 		return arr;
 	}
 
-	function makePuzzleArray(rows, cols,  bombCount) {
-		var randArr = makeIntArray(rows*cols);
-		var puzzleArr = [];
+	function getHintDistance(cols, pos) {
 		var hintDistanceCenter = [-1*(cols+1), -1*cols, -1*(cols-1), -1, 1, cols-1, cols, cols+1];
 		var hintDistanceLeft = [-1*cols, -1*(cols-1), 1, cols, cols+1]; 
 		var hintDistanceRight = [-1*(cols+1), -1*cols, -1, cols-1, cols];
 
-		var incBombHints = function(bombPosition) {
-			var getHintDistance = function() {
-				if(bombPosition === 0 || bombPosition % cols === 0) {
-					return hintDistanceLeft;
-				} else if((bombPosition + 1) % cols === 0) {
-					return hintDistanceRight;
-				} else {
-					return hintDistanceCenter;
-				}
-			};
+		if(pos === 0 || pos % cols === 0) {
+			return hintDistanceLeft;
+		} else if((pos + 1) % cols === 0) {
+			return hintDistanceRight;
+		} else {
+			return hintDistanceCenter;
+		}
+	};
 
-			var hintDistance = getHintDistance();
-			console.log('bombPosition = ' + bombPosition + ', hintDistance = ' + hintDistance);
+	function makePuzzleArray(rows, cols,  bombCount) {
+		var randArr = makeIntArray(rows*cols);
+		var puzzleArr = [];
+
+		var incBombHints = function(bombPosition) {
+			var hintDistance = getHintDistance(cols, bombPosition);
 
 			for(var i=0; i < hintDistance.length; i++) {
 				var hintPosition = bombPosition + hintDistance[i];
@@ -72,7 +72,6 @@
 
 	var drawPuzzle = function(rows, cols, bombCount) {
 		var puzzleArray = makePuzzleArray(rows, cols, bombCount);
-		console.log(puzzleArray);
 
 		var drawBox = function(className, contents) {
 			return dom('div', className || '', contents);
@@ -86,14 +85,28 @@
 		jQuery('body').append(puzzle);
 		jQuery('.box:nth-child(' + 30 + 'n + 1)').css('clear', 'both');
 		jQuery('.box').click(function() {
-			var selectedBox = $(this);
-			var puzzlePosition = selectedBox.attr('id');
-			var boxVal = puzzleArray[puzzlePosition];
-			console.log(boxVal);
-			selectedBox.addClass('selected ' + (boxVal < 0 ? 'bomb ' : '') + (boxVal === 0 ? 'empty ' : '') + (boxVal > 0 ? 'hint' : ''));
-			if(boxVal > 0) {
-				selectedBox.text(boxVal);
+			function addSelectedBoxClass(pos) {
+				for(var i=0; i < pos.length; i++) {
+					var selectedBox = jQuery('#' + pos[i]);
+					var boxVal = puzzleArray[pos[i]];
+					if(pos[i] >= 0 && pos[i] < rows*cols && !selectedBox.hasClass('selected')) {
+
+						selectedBox.addClass('selected ' + (boxVal < 0 ? 'bomb ' : '') + (boxVal === 0 ? 'empty ' : '') + (boxVal > 0 ? 'hint' : ''));
+
+						if(boxVal > 0) {
+							selectedBox.text(boxVal);
+						} else if(boxVal === 0) {
+							var hintDistance = getHintDistance(cols, pos[i]);
+							for(var j=0; j < hintDistance.length; j++) {
+								hintDistance[j] += pos[i];
+							}
+							addSelectedBoxClass(hintDistance);
+						}
+					}
+				}
 			}
+			var puzzlePosition = jQuery(this).attr('id');
+			addSelectedBoxClass([parseInt(puzzlePosition)]);
 		});
 		return puzzle;
 	};
