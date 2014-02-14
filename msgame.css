@@ -27,6 +27,10 @@ body {
 	background-color: black
 }
 
+.box.flag {
+	background-color: #555555;
+}
+
 .instructionsContainer {
 	width: 600px;
 	margin-top: 20px;
