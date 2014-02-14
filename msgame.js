@@ -82,7 +82,7 @@
 			puzzle.append(drawBox('box', i).attr('id', i));
 		};
 		
-		jQuery('body').append(puzzle);
+		jQuery('.mainview').append(puzzle);
 		jQuery('.box:nth-child(' + 30 + 'n + 1)').css('clear', 'both');
 		jQuery('.box').click(function() {
 			function addSelectedBoxClass(pos) {
