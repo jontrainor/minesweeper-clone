@@ -17,3 +17,7 @@
 .box.selected.bomb {
 	background-color: black
 }
+
+.box.flag {
+	background-color: #555555;
+}

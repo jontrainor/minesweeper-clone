@@ -73,6 +73,25 @@
 	var drawPuzzle = function(rows, cols, bombCount) {
 		var puzzleArray = makePuzzleArray(rows, cols, bombCount);
 
+		function addSelectedBoxClass(pos) {
+			for(var i=0; i < pos.length; i++) {
+				var selectedBox = jQuery('#' + pos[i]);
+				var boxVal = puzzleArray[pos[i]];
+				if(pos[i] >= 0 && pos[i] < rows*cols && !selectedBox.hasClass('selected')) {
+					selectedBox.addClass('selected ' + (boxVal < 0 ? 'bomb ' : '') + (boxVal === 0 ? 'empty ' : '') + (boxVal > 0 ? 'hint' : ''));
+					if(boxVal > 0) {
+						selectedBox.text(boxVal);
+					} else if(boxVal === 0) {
+						var hintDistance = getHintDistance(cols, pos[i]);
+						for(var j=0; j < hintDistance.length; j++) {
+							hintDistance[j] += pos[i];
+						}
+						addSelectedBoxClass(hintDistance);
+					}
+				}
+			}
+		}
+
 		var drawBox = function(className, contents) {
 			return dom('div', className || '', contents);
 		};
@@ -84,29 +103,27 @@
 		
 		jQuery('body').append(puzzle);
 		jQuery('.box:nth-child(' + 30 + 'n + 1)').css('clear', 'both');
+
+		var shiftDown = false;
+		jQuery(document).keydown(function(e) {
+			if(e.keyCode === 16) {
+				shiftDown = true;
+			}
+		});
+		jQuery(document).keyup(function(e) {
+			if(e.keyCode === 16) {
+				shiftDown = false;
+			}
+		});
 		jQuery('.box').click(function() {
-			function addSelectedBoxClass(pos) {
-				for(var i=0; i < pos.length; i++) {
-					var selectedBox = jQuery('#' + pos[i]);
-					var boxVal = puzzleArray[pos[i]];
-					if(pos[i] >= 0 && pos[i] < rows*cols && !selectedBox.hasClass('selected')) {
-
-						selectedBox.addClass('selected ' + (boxVal < 0 ? 'bomb ' : '') + (boxVal === 0 ? 'empty ' : '') + (boxVal > 0 ? 'hint' : ''));
-
-						if(boxVal > 0) {
-							selectedBox.text(boxVal);
-						} else if(boxVal === 0) {
-							var hintDistance = getHintDistance(cols, pos[i]);
-							for(var j=0; j < hintDistance.length; j++) {
-								hintDistance[j] += pos[i];
-							}
-							addSelectedBoxClass(hintDistance);
-						}
-					}
+			if(shiftDown === true) {
+				jQuery(this).toggleClass('flag');
+			} else {
+				if(!jQuery(this).hasClass('flag')) {
+					var puzzlePosition = jQuery(this).attr('id');
+					addSelectedBoxClass([parseInt(puzzlePosition)]);
 				}
 			}
-			var puzzlePosition = jQuery(this).attr('id');
-			addSelectedBoxClass([parseInt(puzzlePosition)]);
 		});
 		return puzzle;
 	};
