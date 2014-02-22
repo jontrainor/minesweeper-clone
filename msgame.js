@@ -71,6 +71,7 @@
 	}
 
 	var drawPuzzle = function(rows, cols, bombCount) {
+		var boxSize = 25;
 		var puzzleArray = makePuzzleArray(rows, cols, bombCount);
 
 		function addSelectedBoxClass(pos) {
@@ -93,7 +94,7 @@
 		}
 
 		var drawBox = function(className, contents) {
-			return dom('div', className || '', contents);
+			return dom('div', className || '', contents).css({'height': boxSize + 'px', 'width': boxSize + 'px'});
 		};
 
 		var puzzle = dom('div', 'puzzleContainer', []);
