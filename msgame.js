@@ -70,8 +70,16 @@
 		return puzzleArr;
 	}
 
-	var drawPuzzle = function(rows, cols, bombCount) {
-		var boxSize = 25;
+	var drawPuzzle = function() {
+		var ratioBombsToBoxes = 0.2;
+		var boxSize = 25; 
+		var boxSizeWithBorder = boxSize + 2;
+		var windowWidth = 750;
+		var windowHeight = 400;
+		var rows = Math.floor(windowHeight/boxSizeWithBorder);
+		var cols = Math.floor(windowWidth/boxSizeWithBorder);
+		var bombCount = Math.floor(rows*cols/ratioBombsToBoxes);
+
 		var puzzleArray = makePuzzleArray(rows, cols, bombCount);
 
 		function addSelectedBoxClass(pos) {
@@ -97,13 +105,12 @@
 			return dom('div', className || '', contents).css({'height': boxSize + 'px', 'width': boxSize + 'px'});
 		};
 
-		var puzzle = dom('div', 'puzzleContainer', []);
+		var puzzle = dom('div', 'puzzleContainer', []).css({'height': rows*boxSizeWithBorder + 'px', 'width': cols*boxSizeWithBorder + 'px'});
 		for(var i=0; i < (rows*cols); i++) {
 			puzzle.append(drawBox('box', i).attr('id', i));
 		};
 		
 		jQuery('.mainview').append(puzzle);
-		jQuery('.box:nth-child(' + 30 + 'n + 1)').css('clear', 'both');
 
 		var shiftDown = false;
 		jQuery(document).keydown(function(e) {
@@ -129,5 +136,5 @@
 		return puzzle;
 	};
 
-	drawPuzzle(16,30,100);
+	drawPuzzle();
 })();
