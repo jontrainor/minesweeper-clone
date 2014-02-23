@@ -78,7 +78,7 @@
 		var windowHeight = 400;
 		var rows = Math.floor(windowHeight/boxSizeWithBorder);
 		var cols = Math.floor(windowWidth/boxSizeWithBorder);
-		var bombCount = Math.floor(rows*cols/ratioBombsToBoxes);
+		var bombCount = Math.floor(rows*cols*ratioBombsToBoxes);
 
 		var puzzleArray = makePuzzleArray(rows, cols, bombCount);
 
@@ -88,7 +88,9 @@
 				var boxVal = puzzleArray[pos[i]];
 				if(pos[i] >= 0 && pos[i] < rows*cols && !selectedBox.hasClass('selected')) {
 					selectedBox.addClass('selected ' + (boxVal < 0 ? 'bomb ' : '') + (boxVal === 0 ? 'empty ' : '') + (boxVal > 0 ? 'hint' : ''));
-					if(boxVal > 0) {
+					if(boxVal < 0) {
+						gameOver();
+					} else if(boxVal > 0) {
 						selectedBox.text(boxVal);
 					} else if(boxVal === 0) {
 						var hintDistance = getHintDistance(cols, pos[i]);
@@ -133,8 +135,26 @@
 				}
 			}
 		});
-		return puzzle;
 	};
 
+	var setup = function() {
+		jQuery('.startButton').click(function() {
+			jQuery('.startview').hide();
+			jQuery('.mainview').empty().show();
+			drawPuzzle();
+		});
+
+		jQuery('.restartButton').click(function() {
+			jQuery('.gameoverview').hide();
+			jQuery('.mainview').empty().show();
+			drawPuzzle();
+		});
+	};
+
+	var gameOver = function() {
+		jQuery('.gameoverview').show();
+	};
+
+	setup();
 	drawPuzzle();
 })();
